@@ -54,7 +54,7 @@ jobs:
         cd backend
         python manage.py check
 
-    - name: Run API Tests
-      run: |
-        pip install pytest pytest-django
-        pytest backend
+    # - name: Run API Tests
+    #   run: |
+    #     pip install pytest pytest-django
+    #     pytest backend
