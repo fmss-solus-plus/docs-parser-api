@@ -11,10 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os
 from dotenv import load_dotenv
 from datetime import timedelta
-
+import os
 load_dotenv('.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,13 +41,15 @@ DB_PORT = os.getenv('DB_PORT')
 ALLOWED_HOSTS = ["*"]
 
 #JWT AUTHENTICATION
+
 REST_FRAMEWORK = {
-    "DEFAULT-AUTHENTICATION_CLASSES": (
-    "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        ),
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permission.IsAuthenticated",
-    ]
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }
 
 SIMPLE_JWT = {
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_spectacular',
     'rest_framework',
     'api',
 ]
@@ -84,7 +86,9 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
