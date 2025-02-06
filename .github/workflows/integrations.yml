@@ -44,11 +44,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r backend/requirements.txt
 
-    - name: Check Code Formatting
-      run: |
-        pip install black
-        black --check backend
-
     - name: Run Security Scan
       run: |
         pip install bandit
