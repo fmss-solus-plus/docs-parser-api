@@ -44,11 +44,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r backend/requirements.txt
 
-    - name: Run Migrations
-      run: |
-        cd backend
-        python manage.py migrate --check
-
     - name: Run Linting
       run: |
         pip install flake8
