@@ -54,11 +54,6 @@ jobs:
         cd backend
         python manage.py check
 
-    - name: Collect Static Files
-      run: |
-        cd backend
-        python manage.py collectstatic --noinput
-
     - name: Run API Tests
       run: |
         pip install pytest pytest-django
