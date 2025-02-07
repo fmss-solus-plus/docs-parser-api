@@ -54,7 +54,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFREH_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
 # Application definition
@@ -158,3 +158,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Solus+ Docs Parser API Documentation',
+    'DESCRIPTION': 'This is an API documentation for parsing documents',
+    'VERSION': '1.0.0',
+    'CONTACT': {
+        'name': 'Patrick Gallardo',
+        'email': 'jgallardo@fmss.com.ph',
+    },
+    'SERVERS': [
+        {'url': 'http://127.0.0.1:8000', 'description': 'Local Dev Server'},
+    ],
+}
