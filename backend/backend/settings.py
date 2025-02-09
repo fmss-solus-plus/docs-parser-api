@@ -172,3 +172,9 @@ SPECTACULAR_SETTINGS = {
         {'url': 'http://127.0.0.1:8000', 'description': 'Local Dev Server'},
     ],
 }
+
+SESSION_COOKIE_AGE = 1800 # 30 Minutes
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+LOGIN_URL = '/'
