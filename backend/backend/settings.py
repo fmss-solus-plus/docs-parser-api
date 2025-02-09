@@ -11,10 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os
 from dotenv import load_dotenv
 from datetime import timedelta
-
+import os
 load_dotenv('.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,18 +41,20 @@ DB_PORT = os.getenv('DB_PORT')
 ALLOWED_HOSTS = ["*"]
 
 #JWT AUTHENTICATION
+
 REST_FRAMEWORK = {
-    "DEFAULT-AUTHENTICATION_CLASSES": (
-    "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        ),
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permission.IsAuthenticated",
-    ]
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFREH_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
 # Application definition
@@ -65,8 +66,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_spectacular',
     'rest_framework',
     'api',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -84,7 +87,9 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -154,3 +159,22 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Solus+ Docs Parser API Documentation',
+    'DESCRIPTION': 'This is an API documentation for parsing documents',
+    'VERSION': '1.0.0',
+    'CONTACT': {
+        'name': 'Patrick Gallardo',
+        'email': 'jgallardo@fmss.com.ph',
+    },
+    'SERVERS': [
+        {'url': 'http://127.0.0.1:8000', 'description': 'Local Dev Server'},
+    ],
+}
+
+SESSION_COOKIE_AGE = 1800 # 30 Minutes
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+LOGIN_URL = '/'

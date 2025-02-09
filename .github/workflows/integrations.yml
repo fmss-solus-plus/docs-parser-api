@@ -9,7 +9,6 @@ on:
 jobs:
   django:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:13
@@ -50,6 +49,8 @@ jobs:
         bandit -r backend
 
     - name: Django System Check
+      env:
+        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       run: |
         cd backend
         python manage.py check

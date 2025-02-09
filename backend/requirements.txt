@@ -10,3 +10,4 @@ pytz==2025.1
 psycopg2-binary==2.9.10
 paddleocr==2.9.1
 paddlepaddle==2.6.2
+pdf2image==1.17.0
