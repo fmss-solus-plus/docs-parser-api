@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework.response import Response
 from .serializers import LoginSerializer
+from drf_spectacular.views import SpectacularSwaggerView
+
 import json
 
 # Create your views here.
@@ -23,3 +23,8 @@ def login_page(request):
         else:
             return render(request, 'index.html', {'error':"Invalid credentials"})
     return render(request, 'index.html')
+
+
+@login_required
+def docs_page(request):
+    return SpectacularSwaggerView.as_view(url_name='schema')(request)
