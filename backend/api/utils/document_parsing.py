@@ -23,7 +23,7 @@ def download_file(request):
     file_url = data['fileUrl']
 
     try:
-        response = requests.get(file_url)
+        response = requests.get(file_url, timeout=10)
         if response.status_code != 200:
             print("Failed to download the file")
             return "Failed to download the file"
