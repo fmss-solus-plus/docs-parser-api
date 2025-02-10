@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .serializers import LoginSerializer
 from drf_spectacular.views import SpectacularSwaggerView
+
+from .serializers import LoginSerializer
+from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 
 import json
 
@@ -19,9 +21,9 @@ def login_page(request):
         if serializer.is_valid():
             user = serializer.validated_data
             login(request, user)
-            return JsonResponse({'message': 'Login successful'}, status=200)
+            return JsonResponse({'message': f'{STATUS_MESSAGES["SUCCESS"]["LOGIN_SUCCESSFUL"]}'}, status=STATUS_CODES["SUCCESS"][200])
         else:
-            return render(request, 'index.html', {'error':"Invalid credentials"})
+            return JsonResponse({'message': f'{STATUS_MESSAGES["ERRORS"]["INVALID_CREDENTIALS"]}'}, status=STATUS_CODES["ERRORS"][401])
     return render(request, 'index.html')
 
 
