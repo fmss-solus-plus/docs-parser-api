@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 
-from .utils.document_parsing import download_file
+from .utils.document_parsing import download_file, doc_parse
 from .utils.url_formatter import encode_url
 from .serializers import DocumentUploadSerializer, DocumentUrlSerializer
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
@@ -33,9 +33,12 @@ from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 @parser_classes([MultiPartParser])
 @login_required
 def upload_doc_file(request):
-    serializer = DocumentUploadSerializer(data=request.data)
+    data = request.data
+    serializer = DocumentUploadSerializer(data=data)
+
     if serializer.is_valid():
-        result = download_file(request)
+        file = serializer.validated_data['file']
+        result = doc_parse(file)
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
                          status=STATUS_CODES["success"][200])
@@ -77,7 +80,15 @@ def upload_doc_fileurl(request):
     serializer = DocumentUrlSerializer(data={'file_url': encoded_data})
     if serializer.is_valid():
         file_url = serializer.validated_data['file_url']
-        result = download_file(file_url)
+        downloaded_file = download_file(file_url)
+
+        if not downloaded_file:
+            return Response(
+                {"message": STATUS_MESSAGES["errors"]["FAILED_DOWNLOAD"]},
+                status=STATUS_CODES["errors"][400])
+        
+        result = doc_parse(downloaded_file)
+ 
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
                          status=STATUS_CODES["success"][200])
