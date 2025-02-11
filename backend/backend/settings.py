@@ -171,6 +171,10 @@ SPECTACULAR_SETTINGS = {
     'SERVERS': [
         {'url': 'http://127.0.0.1:8000', 'description': 'Local Dev Server'},
     ],
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SWAGGER_UI_SETTINGS': {
+        'defaultModelsExpandDepth': -1
+    }
 }
 
 SESSION_COOKIE_AGE = 1800 # 30 Minutes
