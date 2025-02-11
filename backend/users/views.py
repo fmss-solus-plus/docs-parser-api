@@ -21,9 +21,11 @@ def login_page(request):
         if serializer.is_valid():
             user = serializer.validated_data
             login(request, user)
-            return JsonResponse({'message': f'{STATUS_MESSAGES["SUCCESS"]["LOGIN_SUCCESSFUL"]}'}, status=STATUS_CODES["SUCCESS"][200])
+            return JsonResponse({'message': f'{STATUS_MESSAGES["success"]["LOGIN_SUCCESSFUL"]}'}, 
+                            status=STATUS_CODES["success"][200])
         else:
-            return JsonResponse({'message': f'{STATUS_MESSAGES["ERRORS"]["INVALID_CREDENTIALS"]}'}, status=STATUS_CODES["ERRORS"][401])
+            return JsonResponse({'message': f'{STATUS_MESSAGES["errors"]["INVALID_CREDENTIALS"]}'}, 
+                            status=STATUS_CODES["errors"][401])
     return render(request, 'index.html')
 
 
