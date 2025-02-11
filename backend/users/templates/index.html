@@ -46,6 +46,7 @@
         .error {
             color: red;
             text-align: center;
+            padding-bottom: 1rem;
         }
     </style>
 </head>
@@ -54,9 +55,7 @@
 <div class="container">
     <h2>Login</h2>
 
-    {% if error %}
-        <div class="error">{{ error }}</div>
-    {% endif %}
+    <div class="error"></div>
 
     <form method="POST" id="loginForm">
         {% csrf_token %}
@@ -85,6 +84,8 @@
     form.onsubmit = async (e) => {
         e.preventDefault();
 
+        const errorDiv = document.querySelector('.error').innerHTML = ``
+
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
         const csrfToken = getCSRFToken();  // Get CSRF token from cookies
@@ -103,7 +104,8 @@
         if (response.ok) {
             window.location.href = "/users/docs/";  // Redirect on successful login
         } else {
-            alert(result.message || "Login failed. Please check your credentials.");
+            const errorDiv = document.querySelector('.error').innerHTML = `
+            ${result.message}`
         }
     };
 </script>
