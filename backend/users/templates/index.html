@@ -84,6 +84,8 @@
     form.onsubmit = async (e) => {
         e.preventDefault();
 
+        const errorDiv = document.querySelector('.error').innerHTML = ``
+
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
         const csrfToken = getCSRFToken();  // Get CSRF token from cookies
