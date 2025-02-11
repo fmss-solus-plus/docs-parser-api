@@ -21,7 +21,9 @@ STATUS_MESSAGES = {
         "INVALID_CREDENTIALS": "Invalid username or password.",
         "INVALID_FILE_FORMAT": "Unsupported file format.",
         "AUTH_REQUIRED": "Authentication credentials are missing.",
-        "INVALID_FILE_URL": "The provided file URL is invalid."
+        "INVALID_FILE_URL": "The provided file URL is invalid.",
+        "FAILED_DOWNLOAD": "Failed to download the file.",
+        "UNSUPPORTED_FILE_FORMAT": "Unsupported file format."
     },
     "success": {
         "USER_REGISTERED": "User registered successfully.",
