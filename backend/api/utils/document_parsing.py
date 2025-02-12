@@ -16,7 +16,8 @@ import time
 load_dotenv('.env')
 
 # Initialize PaddleOCR
-ocr = PaddleOCR(lang='en', rec_algorithm='CRNN',
+
+ocr = PaddleOCR(use_angle_cls=True, lang='en', rec_algorithm='CRNN',
                 det_db_box_thresh=0.6, det_db_unclip_ratio=1.5)
 
 
@@ -50,13 +51,14 @@ def process_page(page):
 
 def doc_parse(file):
     start_time = time.time()
-    document_template = ''
     pdf_bytes = file.read()
 
     POPPLER_PATH = os.getenv('POPPLER_PATH')
 
     # Convert PDF to images
-    pages = convert_from_bytes(pdf_bytes, dpi=200, poppler_path=POPPLER_PATH)
+    all_pages = convert_from_bytes(pdf_bytes, dpi=200, poppler_path=POPPLER_PATH)
+    page_numbers_list = [1]
+    pages = [all_pages[i - 1] for i in page_numbers_list] if page_numbers_list else all_pages
 
     extracted_text = ''
     with ThreadPoolExecutor() as executor:
