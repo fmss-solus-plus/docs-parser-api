@@ -10,6 +10,7 @@ from .utils.url_formatter import encode_url
 from .serializers import DocumentUploadSerializer, DocumentUrlSerializer
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 from api.utils.openai_api.template_builder import template_create
+from api.utils.openai_api.ai_classifier import openai_doc_classifier
 
 @extend_schema(
     summary="Upload a document for processing",
@@ -45,12 +46,12 @@ def upload_doc_file(request):
         if templates is None:
             return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
                      status=STATUS_CODES["errors"][400])
-        print("TEMPLATES: ", templates)
 
         file = serializer.validated_data['file']
-        result = doc_parse(file)
+        parsed_file = doc_parse(file)
 
         # DO OPENAI INTEGRATION HERE
+        result = openai_doc_classifier(parsed_file, templates)
 
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
@@ -96,8 +97,6 @@ def upload_doc_fileurl(request):
         if templates is None:
             return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
                      status=STATUS_CODES["errors"][400])
-        print("TEMPLATES: ", templates)
-
         file_url = serializer.validated_data['file_url']
         downloaded_file = download_file(file_url)
 
@@ -106,9 +105,10 @@ def upload_doc_fileurl(request):
                 {"message": STATUS_MESSAGES["errors"]["FAILED_DOWNLOAD"]},
                 status=STATUS_CODES["errors"][400])
         
-        result = doc_parse(downloaded_file)
+        parsed_file = doc_parse(downloaded_file)
 
         # DO OPENAI INTEGRATION HERE
+        result = openai_doc_classifier(parsed_file, templates)
  
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
