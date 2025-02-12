@@ -14,6 +14,12 @@ class DocumentUploadSerializer(serializers.Serializer):
         help_text="Select the document type"
     )
 
+    templates = serializers.CharField(
+        required=False,
+        help_text="Template editor for document content",
+        style={'base_template': 'textarea.html'}
+    )
+
 class DocumentUrlSerializer(serializers.Serializer):
     file_url = serializers.URLField(
         required=True,
@@ -25,4 +31,10 @@ class DocumentUrlSerializer(serializers.Serializer):
         choices=[(key, key) for key in prompts.RECOMMENDED_DOCUMENTS_LISTS.keys()],  # Converts dict keys into choice tuples
         required=True,
         help_text="Select the document type"
+    )
+
+    templates = serializers.CharField(
+        required=False,
+        help_text="Template editor for document content",
+        style={'base_template': 'textarea.html'}
     )
