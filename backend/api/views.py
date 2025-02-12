@@ -9,6 +9,7 @@ from .utils.document_parsing import download_file, doc_parse
 from .utils.url_formatter import encode_url
 from .serializers import DocumentUploadSerializer, DocumentUrlSerializer
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
+from api.utils.openai_api.template_builder import template_create
 
 @extend_schema(
     summary="Upload a document for processing",
@@ -34,11 +35,23 @@ from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 @login_required
 def upload_doc_file(request):
     data = request.data
+    doc_type_data = data.get("document_type")
+
     serializer = DocumentUploadSerializer(data=data)
 
     if serializer.is_valid():
+        templates = template_create(doc_type=doc_type_data)
+
+        if templates is None:
+            return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
+                     status=STATUS_CODES["errors"][400])
+        print("TEMPLATES: ", templates)
+
         file = serializer.validated_data['file']
         result = doc_parse(file)
+
+        # DO OPENAI INTEGRATION HERE
+
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
                          status=STATUS_CODES["success"][200])
@@ -50,13 +63,6 @@ def upload_doc_file(request):
     summary="Upload a document URL for processing",
     description="Uploads a file URL, process it, and returns the classification and extracted text.",
     request=DocumentUrlSerializer,
-    examples=[
-        OpenApiExample(
-            name="Request",
-            value={"file_url": "https://example.com/file.pdf"},
-            request_only=True
-        )
-    ],
     responses={
         STATUS_CODES["success"][200]: OpenApiResponse(
             description=f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
@@ -73,12 +79,25 @@ def upload_doc_file(request):
         }
 )
 @api_view(['POST'])
+@parser_classes([MultiPartParser])
 @login_required
 def upload_doc_fileurl(request):
-    data = request.data.get("file_url")
-    encoded_data = encode_url(url=data)
-    serializer = DocumentUrlSerializer(data={'file_url': encoded_data})
+    file_url_data = request.data.get("file_url")
+    doc_type_data = request.data.get("document_type")
+
+    encoded_data = encode_url(url=file_url_data)
+    serializer_dict = {'file_url': encoded_data, 
+                       'document_type': doc_type_data}
+
+    serializer = DocumentUrlSerializer(data=serializer_dict)
+
     if serializer.is_valid():
+        templates = template_create(doc_type=doc_type_data)
+        if templates is None:
+            return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
+                     status=STATUS_CODES["errors"][400])
+        print("TEMPLATES: ", templates)
+
         file_url = serializer.validated_data['file_url']
         downloaded_file = download_file(file_url)
 
@@ -88,6 +107,8 @@ def upload_doc_fileurl(request):
                 status=STATUS_CODES["errors"][400])
         
         result = doc_parse(downloaded_file)
+
+        # DO OPENAI INTEGRATION HERE
  
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
