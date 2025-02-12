@@ -46,7 +46,7 @@ def process_page(page):
     img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2BGR)
     result = ocr.ocr(img, cls=True)
 
-    return '\n'.join(word_info[0] for line in result[0] for word_info in line if isinstance(word_info[0], str))
+    return ' '.join(word_info[0] for line in result[0] for word_info in line if isinstance(word_info[0], str))
 
 
 def doc_parse(file):
@@ -62,9 +62,9 @@ def doc_parse(file):
 
     extracted_text = ''
     with ThreadPoolExecutor() as executor:
-        extracted_text = executor.map(process_page, pages)
+        extracted_text = list(executor.map(process_page, pages))
     end_time = time.time() 
     elapsed_time = end_time - start_time
     print(f"Document parsing took {elapsed_time:.2f} seconds.")
-    return extracted_text
+    return ' '.join(extracted_text)
 
