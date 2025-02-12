@@ -5,7 +5,7 @@ import os
 load_dotenv('.env')
 AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 
-def openai_doc_classifier(resume_text, templates):
+def openai_doc_classifier(resume_text: str, templates: str):
     openai_api = OpenAI(api_key=AZURE_OPENAI_API_KEY)
 
     messages = [

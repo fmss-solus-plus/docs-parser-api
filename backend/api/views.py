@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from drf_spectacular.types import OpenApiTypes
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
@@ -48,10 +48,11 @@ def upload_doc_file(request):
                      status=STATUS_CODES["errors"][400])
 
         file = serializer.validated_data['file']
-        parsed_file = doc_parse(file)
+        parsed_file = doc_parse(file=file)
 
         # DO OPENAI INTEGRATION HERE
-        result = openai_doc_classifier(parsed_file, templates)
+        result = openai_doc_classifier(resume_text=parsed_file, 
+                                       templates=templates)
 
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
@@ -98,17 +99,18 @@ def upload_doc_fileurl(request):
             return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
                      status=STATUS_CODES["errors"][400])
         file_url = serializer.validated_data['file_url']
-        downloaded_file = download_file(file_url)
+        downloaded_file = download_file(file_url=file_url)
 
         if not downloaded_file:
             return Response(
                 {"message": STATUS_MESSAGES["errors"]["FAILED_DOWNLOAD"]},
                 status=STATUS_CODES["errors"][400])
         
-        parsed_file = doc_parse(downloaded_file)
+        parsed_file = doc_parse(file=downloaded_file)
 
         # DO OPENAI INTEGRATION HERE
-        result = openai_doc_classifier(parsed_file, templates)
+        result = openai_doc_classifier(resume_text=parsed_file, 
+                                       templates=templates)
  
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},

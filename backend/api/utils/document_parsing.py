@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from io import BytesIO
+from typing import BinaryIO
 from paddleocr import PaddleOCR
 from pdf2image import convert_from_bytes
 from dotenv import load_dotenv
@@ -21,7 +22,7 @@ ocr = PaddleOCR(use_angle_cls=True, lang='en', rec_algorithm='CRNN',
                 det_db_box_thresh=0.6, det_db_unclip_ratio=1.5)
 
 
-def download_file(file_url):
+def download_file(file_url: str):
     try:
         response = requests.get(file_url, timeout=10)
         if response.status_code != 200:
@@ -49,7 +50,7 @@ def process_page(page):
     return ' '.join(word_info[0] for line in result[0] for word_info in line if isinstance(word_info[0], str))
 
 
-def doc_parse(file):
+def doc_parse(file: BinaryIO):
     start_time = time.time()
     pdf_bytes = file.read()
 
