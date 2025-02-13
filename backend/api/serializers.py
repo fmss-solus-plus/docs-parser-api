@@ -4,7 +4,7 @@ import api.utils.openai_api.prompt_template as prompts
 
 class DocumentUploadSerializer(serializers.Serializer):
     file = serializers.FileField(
-        required=False,
+        required=True,
         help_text="Document file to upload"
     )
 
@@ -14,9 +14,10 @@ class DocumentUploadSerializer(serializers.Serializer):
         help_text="Select the document type"
     )
 
-    templates = serializers.CharField(
+    template_corrections = serializers.CharField(
         required=False,
-        help_text="Template editor for document content",
+        help_text="Customize or refine the classifier's response by specifying corrections or modifications."
+                  "Example: 'Do not use capital letters in names.'",
         style={'base_template': 'textarea.html'}
     )
 
@@ -33,8 +34,11 @@ class DocumentUrlSerializer(serializers.Serializer):
         help_text="Select the document type"
     )
 
-    templates = serializers.CharField(
+    template_corrections = serializers.CharField(
         required=False,
-        help_text="Template editor for document content",
+        allow_null=True,
+        allow_blank=True,
+        help_text="Customize or refine the classifier's response by specifying corrections or modifications."
+                  "Example: 'Do not use capital letters in names.'",
         style={'base_template': 'textarea.html'}
     )
