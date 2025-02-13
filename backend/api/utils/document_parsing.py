@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from io import BytesIO
+from typing import BinaryIO
 from paddleocr import PaddleOCR
 from pdf2image import convert_from_bytes
 from dotenv import load_dotenv
@@ -16,11 +17,12 @@ import time
 load_dotenv('.env')
 
 # Initialize PaddleOCR
-ocr = PaddleOCR(lang='en', rec_algorithm='CRNN',
+
+ocr = PaddleOCR(use_angle_cls=True, lang='en', rec_algorithm='CRNN',
                 det_db_box_thresh=0.6, det_db_unclip_ratio=1.5)
 
 
-def download_file(file_url):
+def download_file(file_url: str):
     try:
         response = requests.get(file_url, timeout=10)
         if response.status_code != 200:
@@ -45,24 +47,25 @@ def process_page(page):
     img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2BGR)
     result = ocr.ocr(img, cls=True)
 
-    return '\n'.join(word_info[0] for line in result[0] for word_info in line if isinstance(word_info[0], str))
+    return ' '.join(word_info[0] for line in result[0] for word_info in line if isinstance(word_info[0], str))
 
 
-def doc_parse(file):
+def doc_parse(file: BinaryIO):
     start_time = time.time()
-    document_template = ''
     pdf_bytes = file.read()
 
     POPPLER_PATH = os.getenv('POPPLER_PATH')
 
     # Convert PDF to images
-    pages = convert_from_bytes(pdf_bytes, dpi=200, poppler_path=POPPLER_PATH)
+    all_pages = convert_from_bytes(pdf_bytes, dpi=200, poppler_path=POPPLER_PATH)
+    page_numbers_list = [1]
+    pages = [all_pages[i - 1] for i in page_numbers_list] if page_numbers_list else all_pages
 
     extracted_text = ''
     with ThreadPoolExecutor() as executor:
-        extracted_text = executor.map(process_page, pages)
+        extracted_text = list(executor.map(process_page, pages))
     end_time = time.time() 
     elapsed_time = end_time - start_time
     print(f"Document parsing took {elapsed_time:.2f} seconds.")
-    return extracted_text
+    return ' '.join(extracted_text)
 
