@@ -36,12 +36,12 @@ from api.utils.openai_api.ai_classifier import openai_doc_classifier
 @login_required
 def upload_doc_file(request):
     data = request.data
-    doc_type_data = data.get("document_type")
 
     serializer = DocumentUploadSerializer(data=data)
 
     if serializer.is_valid():
-        templates = template_create(doc_type=doc_type_data)
+        templates = template_create(doc_type=serializer.validated_data['document_type'],
+                                    template_corrections=serializer.validated_data['template_corrections'])
 
         if templates is None:
             return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
@@ -86,15 +86,19 @@ def upload_doc_file(request):
 def upload_doc_fileurl(request):
     file_url_data = request.data.get("file_url")
     doc_type_data = request.data.get("document_type")
+    template_correction_data = request.data.get("template_corrections")
 
     encoded_data = encode_url(url=file_url_data)
     serializer_dict = {'file_url': encoded_data, 
-                       'document_type': doc_type_data}
+                       'document_type': doc_type_data,
+                       'template_corrections': template_correction_data}
 
     serializer = DocumentUrlSerializer(data=serializer_dict)
-
+    print(serializer)
     if serializer.is_valid():
-        templates = template_create(doc_type=doc_type_data)
+        templates = template_create(doc_type=serializer.validated_data['document_type'],
+                                    template_corrections=serializer.validated_data['template_corrections'])
+        print(templates)
         if templates is None:
             return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
                      status=STATUS_CODES["errors"][400])
