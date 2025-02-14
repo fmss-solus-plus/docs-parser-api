@@ -11,6 +11,7 @@ from .serializers import DocumentUploadSerializer, DocumentUrlSerializer
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 from api.utils.openai_api.template_builder import template_create
 from api.utils.openai_api.ai_classifier import openai_doc_classifier
+import time
 
 @extend_schema(
     summary="Upload a document for processing",
@@ -35,12 +36,15 @@ from api.utils.openai_api.ai_classifier import openai_doc_classifier
 @parser_classes([MultiPartParser])
 @login_required
 def upload_doc_file(request):
+    start_time = time.time()
     data = request.data
 
     serializer = DocumentUploadSerializer(data=data)
 
     if serializer.is_valid():
-        templates = template_create(doc_type=serializer.validated_data['document_type'],
+        doc_type = serializer.validated_data['document_type']
+
+        templates = template_create(doc_type=doc_type,
                                     template_corrections=serializer.validated_data['template_corrections'])
 
         if templates is None:
@@ -48,12 +52,17 @@ def upload_doc_file(request):
                      status=STATUS_CODES["errors"][400])
 
         file = serializer.validated_data['file']
+        print(file)
         parsed_file = doc_parse(file=file)
 
         # DO OPENAI INTEGRATION HERE
         result = openai_doc_classifier(resume_text=parsed_file, 
-                                       templates=templates)
-
+                                       templates=templates,
+                                       document_type=doc_type)
+        end_time = time.time() 
+        elapsed_time = end_time - start_time
+        print(f"Document parsing took {elapsed_time:.2f} seconds.")
+        
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
                          status=STATUS_CODES["success"][200])
@@ -84,6 +93,8 @@ def upload_doc_file(request):
 @parser_classes([MultiPartParser])
 @login_required
 def upload_doc_fileurl(request):
+    start_time = time.time()
+
     file_url_data = request.data.get("file_url")
     doc_type_data = request.data.get("document_type")
     template_correction_data = request.data.get("template_corrections")
@@ -95,10 +106,13 @@ def upload_doc_fileurl(request):
 
     serializer = DocumentUrlSerializer(data=serializer_dict)
     print(serializer)
+    print(serializer.is_valid())
     if serializer.is_valid():
-        templates = template_create(doc_type=serializer.validated_data['document_type'],
+        doc_type = serializer.validated_data['document_type']
+
+        templates = template_create(doc_type=doc_type,
                                     template_corrections=serializer.validated_data['template_corrections'])
-        print(templates)
+        print("TEMPLATES =",templates)
         if templates is None:
             return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
                      status=STATUS_CODES["errors"][400])
@@ -114,8 +128,12 @@ def upload_doc_fileurl(request):
 
         # DO OPENAI INTEGRATION HERE
         result = openai_doc_classifier(resume_text=parsed_file, 
-                                       templates=templates)
- 
+                                        templates=templates,
+                                        document_type=doc_type)
+        end_time = time.time() 
+        elapsed_time = end_time - start_time
+        print(f"Document parsing took {elapsed_time:.2f} seconds.")
+
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
                          status=STATUS_CODES["success"][200])
