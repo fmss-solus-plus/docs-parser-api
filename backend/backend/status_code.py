@@ -6,6 +6,7 @@ STATUS_CODES = {
         401: status.HTTP_401_UNAUTHORIZED,
         404: status.HTTP_404_NOT_FOUND,
         415: status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        500: status.HTTP_500_INTERNAL_SERVER_ERROR
     },
     "success": {
         200: status.HTTP_200_OK,
