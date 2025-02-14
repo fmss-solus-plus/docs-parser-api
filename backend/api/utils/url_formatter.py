@@ -1,5 +1,4 @@
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 def encode_url(url: str) -> str:
-   encoded_data = quote(url, safe="/:?=")
-   return encoded_data
+    return url if "%" in url else quote(url, safe="/:?=")
