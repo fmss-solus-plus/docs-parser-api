@@ -1,6 +1,6 @@
 from openai import OpenAI
 from dotenv import load_dotenv
-from api.models import OpenAIRequest
+
 
 import os
 load_dotenv('.env')
@@ -31,26 +31,6 @@ def openai_doc_classifier(resume_text: str,
     prompt_tokens = response.usage.prompt_tokens
     completion_tokens = response.usage.completion_tokens
 
-    # add_ai_usage_logs(document_type=document_type,
-    #                   ai_model=openai_model,
-    #                   prompt_tokens=prompt_tokens,
-    #                   completion_tokens=completion_tokens,
-    #                   total_tokens=total_tokens)
-
     data = response.choices[0].message.content
 
     return data
-    
-# def add_ai_usage_logs(document_type: str, 
-#                       ai_model: str, 
-#                       prompt_tokens: int,
-#                       completion_tokens: int,
-#                       total_tokens: int):
-    
-#     OpenAIRequest.objects.create(
-#         document_type=document_type,
-#         ai_model=ai_model,
-#         prompt_tokens=prompt_tokens,
-#         completion_tokens=completion_tokens,
-#         total_tokens=total_tokens
-#     )
