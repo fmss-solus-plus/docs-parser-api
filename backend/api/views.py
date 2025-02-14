@@ -52,7 +52,7 @@ def upload_doc_file(request):
                      status=STATUS_CODES["errors"][400])
 
         file = serializer.validated_data['file']
-        print(file)
+
         parsed_file = doc_parse(file=file)
 
         # DO OPENAI INTEGRATION HERE
@@ -62,7 +62,7 @@ def upload_doc_file(request):
         end_time = time.time() 
         elapsed_time = end_time - start_time
         print(f"Document parsing took {elapsed_time:.2f} seconds.")
-        
+
         return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
                          "extracted_file": result},
                          status=STATUS_CODES["success"][200])
@@ -105,14 +105,13 @@ def upload_doc_fileurl(request):
                        'template_corrections': template_correction_data}
 
     serializer = DocumentUrlSerializer(data=serializer_dict)
-    print(serializer)
-    print(serializer.is_valid())
+
     if serializer.is_valid():
         doc_type = serializer.validated_data['document_type']
 
         templates = template_create(doc_type=doc_type,
                                     template_corrections=serializer.validated_data['template_corrections'])
-        print("TEMPLATES =",templates)
+
         if templates is None:
             return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
                      status=STATUS_CODES["errors"][400])
