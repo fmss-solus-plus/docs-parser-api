@@ -11,6 +11,8 @@ from .serializers import DocumentUploadSerializer, DocumentUrlSerializer
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 from api.utils.openai_api.template_builder import template_create
 from api.utils.openai_api.ai_classifier import openai_doc_classifier
+import time
+
 
 @extend_schema(
     summary="Upload a document for processing",
@@ -19,46 +21,66 @@ from api.utils.openai_api.ai_classifier import openai_doc_classifier
     responses={
         STATUS_CODES["success"][200]: OpenApiResponse(
             description=f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
-            response=OpenApiTypes.OBJECT
+            response=OpenApiTypes.OBJECT,
         ),
         STATUS_CODES["errors"][400]: OpenApiResponse(
             description=f'{STATUS_MESSAGES["errors"]["INVALID_FILE_FORMAT"]}',
-            response=OpenApiTypes.OBJECT
+            response=OpenApiTypes.OBJECT,
         ),
         STATUS_CODES["errors"][401]: OpenApiResponse(
             description=f'{STATUS_MESSAGES["errors"]["AUTH_REQUIRED"]}',
-            response=OpenApiTypes.OBJECT
+            response=OpenApiTypes.OBJECT,
         ),
-        }
+    },
 )
-@api_view(['POST'])
+@api_view(["POST"])
 @parser_classes([MultiPartParser])
 @login_required
 def upload_doc_file(request):
+    start_time = time.time()
     data = request.data
 
     serializer = DocumentUploadSerializer(data=data)
 
     if serializer.is_valid():
-        templates = template_create(doc_type=serializer.validated_data['document_type'],
-                                    template_corrections=serializer.validated_data['template_corrections'])
+        doc_type = serializer.validated_data["document_type"]
+
+        templates = template_create(
+            doc_type=doc_type,
+            template_corrections=serializer.validated_data["template_corrections"],
+        )
 
         if templates is None:
-            return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
-                     status=STATUS_CODES["errors"][400])
+            return Response(
+                {
+                    "message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'
+                },
+                status=STATUS_CODES["errors"][400],
+            )
 
-        file = serializer.validated_data['file']
+        file = serializer.validated_data["file"]
+
         parsed_file = doc_parse(file=file)
 
         # DO OPENAI INTEGRATION HERE
-        result = openai_doc_classifier(resume_text=parsed_file, 
-                                       templates=templates)
+        result = openai_doc_classifier(
+            resume_text=parsed_file, templates=templates, document_type=doc_type
+        )
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"Document parsing took {elapsed_time:.2f} seconds.")
 
-        return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
-                         "extracted_file": result},
-                         status=STATUS_CODES["success"][200])
-    return Response({"message": f'{STATUS_MESSAGES["errors"]["INVALID_FILE_FORMAT"]}'},
-                     status=STATUS_CODES["errors"][400])
+        return Response(
+            {
+                "message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
+                "extracted_file": result,
+            },
+            status=STATUS_CODES["success"][200],
+        )
+    return Response(
+        {"message": f'{STATUS_MESSAGES["errors"]["INVALID_FILE_FORMAT"]}'},
+        status=STATUS_CODES["errors"][400],
+    )
 
 
 @extend_schema(
@@ -68,56 +90,79 @@ def upload_doc_file(request):
     responses={
         STATUS_CODES["success"][200]: OpenApiResponse(
             description=f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
-            response=OpenApiTypes.OBJECT
+            response=OpenApiTypes.OBJECT,
         ),
         STATUS_CODES["errors"][400]: OpenApiResponse(
             description=f'{STATUS_MESSAGES["errors"]["INVALID_FILE_FORMAT"]}',
-            response=OpenApiTypes.OBJECT
+            response=OpenApiTypes.OBJECT,
         ),
         STATUS_CODES["errors"][401]: OpenApiResponse(
             description=f'{STATUS_MESSAGES["errors"]["AUTH_REQUIRED"]}',
-            response=OpenApiTypes.OBJECT
+            response=OpenApiTypes.OBJECT,
         ),
-        }
+    },
 )
-@api_view(['POST'])
+@api_view(["POST"])
 @parser_classes([MultiPartParser])
 @login_required
 def upload_doc_fileurl(request):
+    start_time = time.time()
+
     file_url_data = request.data.get("file_url")
     doc_type_data = request.data.get("document_type")
     template_correction_data = request.data.get("template_corrections")
 
     encoded_data = encode_url(url=file_url_data)
-    serializer_dict = {'file_url': encoded_data, 
-                       'document_type': doc_type_data,
-                       'template_corrections': template_correction_data}
+    serializer_dict = {
+        "file_url": encoded_data,
+        "document_type": doc_type_data,
+        "template_corrections": template_correction_data,
+    }
 
     serializer = DocumentUrlSerializer(data=serializer_dict)
-    print(serializer)
+
     if serializer.is_valid():
-        templates = template_create(doc_type=serializer.validated_data['document_type'],
-                                    template_corrections=serializer.validated_data['template_corrections'])
-        print(templates)
+        doc_type = serializer.validated_data["document_type"]
+
+        templates = template_create(
+            doc_type=doc_type,
+            template_corrections=serializer.validated_data["template_corrections"],
+        )
+
         if templates is None:
-            return Response({"message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'},
-                     status=STATUS_CODES["errors"][400])
-        file_url = serializer.validated_data['file_url']
+            return Response(
+                {
+                    "message": f'{STATUS_MESSAGES["errors"]["UNSUPPORTED_DOCUMENT_FORMAT"]}'
+                },
+                status=STATUS_CODES["errors"][400],
+            )
+        file_url = serializer.validated_data["file_url"]
         downloaded_file = download_file(file_url=file_url)
 
         if not downloaded_file:
             return Response(
                 {"message": STATUS_MESSAGES["errors"]["FAILED_DOWNLOAD"]},
-                status=STATUS_CODES["errors"][400])
-        
+                status=STATUS_CODES["errors"][400],
+            )
+
         parsed_file = doc_parse(file=downloaded_file)
 
         # DO OPENAI INTEGRATION HERE
-        result = openai_doc_classifier(resume_text=parsed_file, 
-                                       templates=templates)
- 
-        return Response({"message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
-                         "extracted_file": result},
-                         status=STATUS_CODES["success"][200])
-    return Response({"message": f'{STATUS_MESSAGES["errors"]["INVALID_FILE_FORMAT"]}'},
-                     status=STATUS_CODES["errors"][400])
+        result = openai_doc_classifier(
+            resume_text=parsed_file, templates=templates, document_type=doc_type
+        )
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"Document parsing took {elapsed_time:.2f} seconds.")
+
+        return Response(
+            {
+                "message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
+                "extracted_file": result,
+            },
+            status=STATUS_CODES["success"][200],
+        )
+    return Response(
+        {"message": f'{STATUS_MESSAGES["errors"]["INVALID_FILE_FORMAT"]}'},
+        status=STATUS_CODES["errors"][400],
+    )
