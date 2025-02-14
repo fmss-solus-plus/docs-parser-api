@@ -6,13 +6,13 @@ STATUS_CODES = {
         401: status.HTTP_401_UNAUTHORIZED,
         404: status.HTTP_404_NOT_FOUND,
         415: status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        500: status.HTTP_500_INTERNAL_SERVER_ERROR
+        500: status.HTTP_500_INTERNAL_SERVER_ERROR,
     },
     "success": {
         200: status.HTTP_200_OK,
         201: status.HTTP_201_CREATED,
         202: status.HTTP_202_ACCEPTED,
-    }
+    },
 }
 
 STATUS_MESSAGES = {
@@ -25,11 +25,11 @@ STATUS_MESSAGES = {
         "INVALID_FILE_URL": "The provided file URL is invalid.",
         "FAILED_DOWNLOAD": "Failed to download the file.",
         "UNSUPPORTED_FILE_FORMAT": "Unsupported file format.",
-        "UNSUPPORTED_DOCUMENT_FORMAT": "Unsupported document format provided."
+        "UNSUPPORTED_DOCUMENT_FORMAT": "Unsupported document format provided.",
     },
     "success": {
         "USER_REGISTERED": "User registered successfully.",
         "LOGIN_SUCCESSFUL": "Login successful.",
-        "FILE_PROCESSED": "File processed successfully."
-    }
+        "FILE_PROCESSED": "File processed successfully.",
+    },
 }
