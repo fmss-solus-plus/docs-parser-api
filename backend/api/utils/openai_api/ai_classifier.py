@@ -1,11 +1,14 @@
 from openai import OpenAI
 from dotenv import load_dotenv
+from api.models import OpenAIRequest
 
 import os
 load_dotenv('.env')
 AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 
-def openai_doc_classifier(resume_text: str, templates: str):
+def openai_doc_classifier(resume_text: str, 
+                          templates: str,
+                          document_type: str):
     openai_api = OpenAI(api_key=AZURE_OPENAI_API_KEY)
 
     messages = [
@@ -14,19 +17,40 @@ def openai_doc_classifier(resume_text: str, templates: str):
     ]
 
     user_info = resume_text
+    openai_model = "gpt-3.5-turbo"
 
     messages.append({"role": "user", "content": user_info}) 
-    print("############## MESSAGES ##############: ", messages)
+
     response = openai_api.chat.completions.create(
-               model="gpt-3.5-turbo",
+               model=openai_model,
                messages=messages,
                temperature=0.9,
                max_tokens=1000,
     )
-    print("(PROMPT TOKENS) tokens used from requesting message -", response.usage.prompt_tokens)
-    print("(COMPLETION TOKENS) tokens used when generating response -", response.usage.completion_tokens)
-    print("TOTAL TOKENS USED -", response.usage.total_tokens)
+    total_tokens = response.usage.total_tokens
+    prompt_tokens = response.usage.prompt_tokens
+    completion_tokens = response.usage.completion_tokens
+
+    # add_ai_usage_logs(document_type=document_type,
+    #                   ai_model=openai_model,
+    #                   prompt_tokens=prompt_tokens,
+    #                   completion_tokens=completion_tokens,
+    #                   total_tokens=total_tokens)
+
     data = response.choices[0].message.content
 
     return data
     
+# def add_ai_usage_logs(document_type: str, 
+#                       ai_model: str, 
+#                       prompt_tokens: int,
+#                       completion_tokens: int,
+#                       total_tokens: int):
+    
+#     OpenAIRequest.objects.create(
+#         document_type=document_type,
+#         ai_model=ai_model,
+#         prompt_tokens=prompt_tokens,
+#         completion_tokens=completion_tokens,
+#         total_tokens=total_tokens
+#     )
