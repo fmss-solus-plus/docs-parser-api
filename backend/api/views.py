@@ -9,7 +9,7 @@ from .utils.document_parsing import download_file, doc_parse
 from .utils.url_formatter import encode_url
 from .serializers import DocumentUploadSerializer, DocumentUrlSerializer
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
-from api.utils.openai_api.template_builder import template_create
+from api.utils.openai_api.template_builder import template_create, template_create_2
 from api.utils.openai_api.ai_classifier import openai_doc_classifier
 import time
 
@@ -124,11 +124,11 @@ def upload_doc_fileurl(request):
     if serializer.is_valid():
         doc_type = serializer.validated_data["document_type"]
 
-        templates = template_create(
+        templates = template_create_2(
             doc_type=doc_type,
             template_corrections=serializer.validated_data["template_corrections"],
         )
-
+        print("TEMPLATES: ", templates)
         if templates is None:
             return Response(
                 {
@@ -151,6 +151,7 @@ def upload_doc_fileurl(request):
         result = openai_doc_classifier(
             resume_text=parsed_file, templates=templates, document_type=doc_type
         )
+        print("PARSED_FILEEE: ", parsed_file)
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"Document parsing took {elapsed_time:.2f} seconds.")
