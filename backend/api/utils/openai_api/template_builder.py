@@ -68,6 +68,8 @@ def template_create_2(doc_type: str, template_corrections: str = None):
     if "SHIP/PROJECT_DEPARTMENT_LEVEL" in prompts.RECOMMENDED_DOCUMENTS_LISTS[doc_type]:
         template += f"{prompts.SPECIALIZED_TEMPLATE_2['SHIP_PROJECT_DEPARTMENT_LEVEL']}"
     if template_corrections:
-        template += f"{template_corrections}"
-
+        template += (
+            f"{prompts.TEMPLATE_CORRECTIONS}"
+            f"{template_corrections}"
+        )
     return template
