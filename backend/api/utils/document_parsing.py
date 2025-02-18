@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 
 import numpy as np
+import subprocess
 import cv2
 import requests
 import os
@@ -61,11 +62,23 @@ def process_page(page):
     )
 
 
+def is_poppler_installed() -> bool:
+    try:
+        # Try running pdftoppm command to check if Poppler is installed
+        subprocess.run(["pdftoppm", "-v"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
 def doc_parse(file: BinaryIO):
     start_time = time.time()
     pdf_bytes = file.read()
 
-    POPPLER_PATH = os.getenv("POPPLER_PATH")
+    # Check if Poppler is installed locally
+    if is_poppler_installed():
+        POPPLER_PATH = None  # Use default path if Poppler is installed
+    else:
+        POPPLER_PATH = os.getenv("POPPLER_PATH")
 
     # Convert PDF to images
     all_pages = convert_from_bytes(pdf_bytes, dpi=200, poppler_path=POPPLER_PATH)
