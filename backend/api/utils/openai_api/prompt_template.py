@@ -57,6 +57,14 @@ Please only extract the name after NAME:
 Always get the nearest relevant name and not any other name or title that appears near the beginning of the document.
 If the first name has three words or more, the first two or three belong as the FIRST_NAME based on common name. An example of this is: JOHN PAUL, MARIA ANN ROSE.
 Avoid assumming the second word is middle name.
+Words like Sven, Transh is not a valid name, Always check the for naming conventions.
+
+Please always follow this template for name.
+NAME: {
+LAST_NAME: DELA CRUZ,
+FIRST_NAME: JUAN CARLO,
+MIDDLE_NAME: LOPEZ
+}
 """,
     "VALIDITY_DATE": """ 
 Please consider that the Date of Expiry is also the VALIDITY_DATE
