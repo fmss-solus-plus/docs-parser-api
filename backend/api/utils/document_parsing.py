@@ -8,7 +8,6 @@ from concurrent.futures import ThreadPoolExecutor
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 
 import numpy as np
-import subprocess
 import cv2
 import requests
 import os
