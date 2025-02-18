@@ -1,5 +1,5 @@
 SYSTEM_TEMPLATE = """ 
-You are a professional AI specializing in clasifying and categorizing [*doc_type*] documents. Classify and categorize carefully the information based on the following rules: 
+You are a professional AI specializing in classifying and categorizing [*doc_type*] documents. Classify and categorize carefully the information based on the following rules: 
 """
 HARDENING_TEMPLATE = """ 
 - Return Output in Valid JSON Format. 
@@ -42,12 +42,12 @@ RECOMMENDED_DOCUMENTS_LISTS = {
 }
 
 SYSTEM_TEMPLATE_2 = """ 
-You are a professional agent that specializes in clasifying [*doc_type*] documents. Your task is to clasify [*required_docs*] in the given text correctly and accurately.
+You are a professional agent that specializes in classifying [*doc_type*] documents. Your task is to classify [*required_docs*] in the given text correctly and accurately.
 """
 HARDENING_TEMPLATE_2 = """
 Please consider the Dates base on its context.
 Please use this format when classifying Dates: YYYY-MM-DD.
-Always clasify the [*doc_type*] documents in a valid json format and avoid returning the word json.
+Always classify the [*doc_type*] documents in a valid json format and avoid returning the word json.
 Return "Not specified" if no category is found.
 """
 SPECIALIZED_TEMPLATE_2 = {
