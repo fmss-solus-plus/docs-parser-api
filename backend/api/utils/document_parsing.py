@@ -65,6 +65,7 @@ def process_page(page):
 def is_poppler_installed() -> bool:
     try:
         # Try running pdftoppm command to check if Poppler is installed
+        # nosec: B603
         subprocess.run(["pdftoppm", "-v"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, shell=False)
         return True
     except subprocess.CalledProcessError:
