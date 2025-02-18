@@ -21,8 +21,11 @@ def openai_doc_classifier(resume_text: str, templates: str, document_type: str):
     response = openai_api.chat.completions.create(
         model=openai_model,
         messages=messages,
-        temperature=0.9,
+        temperature=1,
+        top_p=1,
         max_tokens=1000,
+        frequency_penalty=0,
+        presence_penalty=0
     )
 
     total_tokens = response.usage.total_tokens
