@@ -87,3 +87,8 @@ RECOMMENDED_DOCUMENTS_LISTS_2 = {
     "visa": """ISSUING_BODY, VALIDITY_DATE, ISSUED_DATE, DOCUMENT_NUMBER, VISA_TYPE, PLACE_OF_ISSUE, NAME""",
     "passport": """VALIDITY_DATE, ISSUED_DATE, DOCUMENT_NUMBER, PLACE_OF_ISSUE, COUNTRY, NAME""",
 }
+
+TEMPLATE_CORRECTIONS = """
+Listed below are corrections in the way you are classifying the documents.
+Carefully consider these corrections when classifying.
+"""
