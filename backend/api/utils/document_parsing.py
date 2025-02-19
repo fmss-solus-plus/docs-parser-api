@@ -3,18 +3,14 @@ from io import BytesIO
 from typing import BinaryIO
 from paddleocr import PaddleOCR
 from pdf2image import convert_from_bytes
-from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
+from backend.settings import POPPLER_PATH
 
 import numpy as np
 import cv2
 import requests
-import os
 import time
-
-# from app.utils.openai.create_template import create_template
-load_dotenv(".env")
 
 # Initialize PaddleOCR
 
@@ -64,8 +60,6 @@ def process_page(page):
 def doc_parse(file: BinaryIO):
     start_time = time.time()
     pdf_bytes = file.read()
-
-    POPPLER_PATH = os.getenv("POPPLER_PATH")
 
     # Convert PDF to images
     all_pages = convert_from_bytes(pdf_bytes, dpi=200, poppler_path=POPPLER_PATH)

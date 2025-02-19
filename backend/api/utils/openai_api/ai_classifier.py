@@ -1,11 +1,6 @@
 from openai import OpenAI
-from dotenv import load_dotenv
 from api.models import OpenAIRequest
-
-import os
-
-load_dotenv(".env")
-AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+from backend.settings import AZURE_OPENAI_API_KEY
 
 
 def openai_doc_classifier(resume_text: str, templates: str, document_type: str):
