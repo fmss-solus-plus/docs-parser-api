@@ -16,6 +16,7 @@ import multiprocessing
 # Initialize PaddleOCR (Enable GPU if available)
 ocr = PaddleOCR(
     use_angle_cls=True,
+    show_log=True,
     lang="en",
     rec_algorithm="CRNN",
     det_db_box_thresh=0.6,
