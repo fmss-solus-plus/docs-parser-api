@@ -37,6 +37,7 @@ POSTGRES_DB_USER = get_env_variable("POSTGRES_DB_USER")
 POSTGRES_DB_PASSWORD = get_env_variable("POSTGRES_DB_PASSWORD")
 DB_HOST = get_env_variable("DB_HOST")
 DB_PORT = get_env_variable("DB_PORT")
+DB_NAME = get_env_variable("DB_NAME")
 
 ALLOWED_HOSTS = ["*"]
 
@@ -109,7 +110,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "solus+_docsapi_db",
+        "NAME": DB_NAME,
         "USER": POSTGRES_DB_USER,
         "PASSWORD": POSTGRES_DB_PASSWORD,
         "HOST": DB_HOST,
