@@ -22,6 +22,7 @@ def get_env_variable(name):
             #TODO: make the /dev/ dynamic
             Name=f"/solus_plus/dev/{name}", WithDecryption=True
         )
+        print("REPONSEE: ", response)
         return response["Parameter"]["Value"]
     except Exception as e:
         print(f"Error fetching {name} from AWS: {e}")
