@@ -25,7 +25,9 @@ ocr = PaddleOCR(
 
 def download_file(file_url: str):
     try:
+        print("NOW DOWNLOADING FILE")
         response = requests.get(file_url, timeout=10)
+        print("RESPOOOONSE: ", response)
         if response.status_code != 200:
             return Response(
                 {"message": STATUS_MESSAGES["errors"]["FAILED_DOWNLOAD"]},
@@ -38,6 +40,7 @@ def download_file(file_url: str):
                 {"message": STATUS_MESSAGES["errors"]["UNSUPPORTED_FILE_FORMAT"]},
                 status=STATUS_CODES["errors"][415],
             )
+        print("FINISHEEED DOWNLOADING", response.content)
         return BytesIO(response.content)
     except Exception as e:
         return Response({"message": str(e)}, status=STATUS_CODES["errors"][500])
