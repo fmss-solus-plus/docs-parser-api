@@ -9,7 +9,7 @@ def get_env_variable(name):
     """Fetch environment variables locally or from AWS Parameter Store based on the environment."""
 
     # Detect environment: Default to 'LOCAL' if not set
-    ENV = os.getenv("APP_ENV").upper()
+    ENV = os.getenv("APP_ENV", 'LOCAL').upper()
 
     # If running locally, fetch from system environment
     if ENV == "LOCAL":
@@ -22,7 +22,6 @@ def get_env_variable(name):
             #TODO: make the /dev/ dynamic
             Name=f"/solus_plus/dev/{name}", WithDecryption=True
         )
-        print("REPONSEE: ", response)
         return response["Parameter"]["Value"]
     except Exception as e:
         print(f"Error fetching {name} from AWS: {e}")
