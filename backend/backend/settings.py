@@ -58,6 +58,8 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,11 +71,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "drf_spectacular",
     "rest_framework",
+    "corsheaders",
     "api",
     "users",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
