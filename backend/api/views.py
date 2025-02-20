@@ -103,7 +103,6 @@ def upload_doc_file(request):
     },
 )
 @api_view(["POST"])
-@parser_classes([MultiPartParser])
 @login_required
 def upload_doc_fileurl(request):
     start_time = time.time()
