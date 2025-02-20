@@ -9,7 +9,7 @@ def get_env_variable(name):
     """Fetch environment variables locally or from AWS Parameter Store based on the environment."""
 
     # Detect environment: Default to 'LOCAL' if not set
-    ENV = os.getenv("APP_ENV", "LOCAL").upper()
+    ENV = os.getenv("APP_ENV", 'LOCAL').upper()
 
     # If running locally, fetch from system environment
     if ENV == "LOCAL":
@@ -17,7 +17,7 @@ def get_env_variable(name):
 
     # If running in 'DEV' or 'PROD', fetch from AWS Parameter Store
     try:
-        ssm = boto3.client("ssm", region_name="us-east-1")  # Adjust region
+        ssm = boto3.client("ssm", region_name="ap-southeast-2")  # Adjust region
         response = ssm.get_parameter(
             #TODO: make the /dev/ dynamic
             Name=f"/solus_plus/dev/{name}", WithDecryption=True
