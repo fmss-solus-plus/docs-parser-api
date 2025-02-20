@@ -17,7 +17,7 @@ def get_env_variable(name):
 
     # If running in 'DEV' or 'PROD', fetch from AWS Parameter Store
     try:
-        ssm = boto3.client("ssm", region_name="ap-southeast-2.ec2.")  # Adjust region
+        ssm = boto3.client("ssm", region_name="ap-southeast-2")  # Adjust region
         response = ssm.get_parameter(
             #TODO: make the /dev/ dynamic
             Name=f"/solus_plus/dev/{name}", WithDecryption=True
