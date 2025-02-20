@@ -9,7 +9,7 @@ def get_env_variable(name):
     """Fetch environment variables locally or from AWS Parameter Store based on the environment."""
 
     # Detect environment: Default to 'LOCAL' if not set
-    ENV = os.getenv("APP_ENV", "LOCAL").upper()
+    ENV = os.getenv("APP_ENV").upper()
 
     # If running locally, fetch from system environment
     if ENV == "LOCAL":
