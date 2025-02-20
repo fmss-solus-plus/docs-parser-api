@@ -26,7 +26,7 @@ ocr = PaddleOCR(
 
 def download_file(file_url: str):
     try:
-        print("NOW DOWNLOADING FILE")
+        print("NOW DOWNLOADING FILE ")
         response = requests.get(file_url, timeout=10)
         print("RESPOOOONSE: ", response)
         if response.status_code != 200:
