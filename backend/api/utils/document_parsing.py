@@ -43,6 +43,8 @@ def download_file(file_url: str):
 
 def process_page(page):
     """Process a single page using OCR and extract text."""
+
+    page = page.resize((int(page.width * 1), int(page.height * 1)))  # Resize to double the size
     img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
     result = ocr.ocr(img, cls=True)
 
