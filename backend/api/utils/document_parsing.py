@@ -25,7 +25,6 @@ ocr = PaddleOCR(
 
 def download_file(file_url: str):
     try:
-        print("NOW DOWNLOADING FILE ")
         response = requests.get(file_url, timeout=3)
         if response.status_code != 200:
             return Response(
@@ -39,7 +38,6 @@ def download_file(file_url: str):
                 {"message": STATUS_MESSAGES["errors"]["UNSUPPORTED_FILE_FORMAT"]},
                 status=STATUS_CODES["errors"][415],
             )
-        print("FILE DOWNLOADED")
         return BytesIO(response.content)
     except Exception as e:
         return Response({"message": str(e)}, status=STATUS_CODES["errors"][500])
@@ -62,17 +60,20 @@ def doc_parse(file: BinaryIO):
     start_time = time.time()
     pdf_bytes = file.read()
 
+    print("CONVERTING PDF TO IMAGES: ", pdf_bytes)
+
     # Convert PDF to images (Lower DPI to speed up conversion)
     all_pages = convert_from_bytes(pdf_bytes, dpi=100, poppler_path=POPPLER_PATH)
 
     # Process all pages
     pages = all_pages
-
+    print("PROCESSING PAGES: ", len(pages))
     # Use multi-threading with optimal CPU core count
     num_workers = min(4, multiprocessing.cpu_count())  # Max 4 threads
+    print("NUM WORKERS: ", num_workers)
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         extracted_text = list(executor.map(process_page, pages))
-
+    print("EXTRACTED TEXT: ", extracted_text)
     end_time = time.time()
     print(f"Document parsing took {end_time - start_time:.2f} seconds.")
 
