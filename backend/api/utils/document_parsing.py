@@ -3,6 +3,7 @@ from io import BytesIO
 from typing import BinaryIO
 from paddleocr import PaddleOCR
 from pdf2image import convert_from_bytes
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 from backend.settings import POPPLER_PATH
 
@@ -10,6 +11,8 @@ import numpy as np
 import cv2
 import requests
 import time
+import multiprocessing
+import os
 
 # Initialize PaddleOCR (Enable GPU if available)
 ocr = PaddleOCR(
@@ -43,8 +46,8 @@ def download_file(file_url: str):
 
 def process_page(page):
     """Process a single page using OCR and extract text."""
-
-    page = page.resize((int(page.width * 1), int(page.height * 1)))  # Resize to double the size
+    print("PROCESSING PAGE...")
+    page = page.resize((int(page.width * 0.75), int(page.height * 0.75)))  # Resize to double the size
     img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
     result = ocr.ocr(img, cls=True)
 
@@ -63,9 +66,11 @@ def doc_parse(file: BinaryIO):
     # Convert PDF to images (Lower DPI to speed up conversion)
     all_pages = convert_from_bytes(pdf_bytes, dpi=100, poppler_path=POPPLER_PATH)
 
+    print("START DOCUMENT PROCESSING...")
     # Process only the first page
     extracted_text = process_page(all_pages[0]) if all_pages else ""
 
+    print("EXTRACTED TEXT: ", extracted_text)
     end_time = time.time()
     print(f"Document parsing took {end_time - start_time:.2f} seconds.")
 
