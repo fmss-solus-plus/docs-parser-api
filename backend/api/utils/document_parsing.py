@@ -3,7 +3,6 @@ from io import BytesIO
 from typing import BinaryIO
 from paddleocr import PaddleOCR
 from pdf2image import convert_from_bytes
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 from backend.settings import POPPLER_PATH
 
@@ -11,8 +10,6 @@ import numpy as np
 import cv2
 import requests
 import time
-import multiprocessing
-import os
 
 # Initialize PaddleOCR (Enable GPU if available)
 ocr = PaddleOCR(
