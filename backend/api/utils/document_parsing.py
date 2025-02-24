@@ -3,7 +3,6 @@ from io import BytesIO
 from typing import BinaryIO
 from paddleocr import PaddleOCR
 from pdf2image import convert_from_bytes
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 from backend.settings import POPPLER_PATH
 
@@ -11,8 +10,6 @@ import numpy as np
 import cv2
 import requests
 import time
-import multiprocessing
-import os
 
 
 def download_file(file_url: str):
@@ -60,13 +57,7 @@ def process_page(page):
         if isinstance(word_info[0], str)
     )
 
-    del ocr
-    return extracted_text
-
-def process_page_wrapper(page):
-    """Run OCR in a separate process to free memory after execution."""
-    with multiprocessing.Pool(1) as pool:
-        extracted_text = pool.apply(process_page, (page,))
+    del ocr  # Free up resources
     return extracted_text
 
 
@@ -79,7 +70,7 @@ def doc_parse(file: BinaryIO):
 
     print("START DOCUMENT PROCESSING...")
     # Process only the first page
-    extracted_text = process_page_wrapper(all_pages[0]) if all_pages else ""
+    extracted_text = process_page(all_pages[0]) if all_pages else ""
 
     print("EXTRACTED TEXT: ", extracted_text)
     end_time = time.time()
