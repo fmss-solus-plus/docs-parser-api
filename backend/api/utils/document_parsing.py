@@ -60,8 +60,6 @@ def doc_parse(file: BinaryIO):
     start_time = time.time()
     pdf_bytes = file.read()
 
-    print("CONVERTING PDF TO IMAGES: ", pdf_bytes)
-
     # Convert PDF to images (Lower DPI to speed up conversion)
     all_pages = convert_from_bytes(pdf_bytes, dpi=100, poppler_path=POPPLER_PATH)
 
