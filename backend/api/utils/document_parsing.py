@@ -15,14 +15,6 @@ import multiprocessing
 import os
 
 # Initialize PaddleOCR (Enable GPU if available)
-ocr = PaddleOCR(
-    use_angle_cls=True,
-    lang="en",
-    rec_algorithm="CRNN",
-    det_db_box_thresh=0.6,
-    det_db_unclip_ratio=1.5,
-    use_gpu=True  # Enable GPU acceleration
-)
 
 def download_file(file_url: str):
     try:
@@ -49,7 +41,18 @@ def process_page(page):
     print("PROCESSING PAGE...")
     page = page.resize((int(page.width * 0.75), int(page.height * 0.75)))  # Resize to double the size
     img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
+
+    ocr = PaddleOCR(
+    use_angle_cls=True,
+    lang="en",
+    rec_algorithm="CRNN",
+    det_db_box_thresh=0.6,
+    det_db_unclip_ratio=1.5,
+    use_gpu=True  # Enable GPU acceleration
+    )
+    
     result = ocr.ocr(img, cls=True)
+    del ocr
 
     return " ".join(
         word_info[0]
