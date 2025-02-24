@@ -3,6 +3,7 @@ from io import BytesIO
 from typing import BinaryIO
 from paddleocr import PaddleOCR
 from pdf2image import convert_from_bytes
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 from backend.settings import POPPLER_PATH
 
@@ -10,7 +11,18 @@ import numpy as np
 import cv2
 import requests
 import time
+import multiprocessing
+import os
 
+# Initialize PaddleOCR (Enable GPU if available)
+ocr = PaddleOCR(
+    use_angle_cls=True,
+    lang="en",
+    rec_algorithm="CRNN",
+    det_db_box_thresh=0.6,
+    det_db_unclip_ratio=1.5,
+    use_gpu=True  # Enable GPU acceleration
+)
 
 def download_file(file_url: str):
     try:
@@ -35,30 +47,16 @@ def download_file(file_url: str):
 def process_page(page):
     """Process a single page using OCR and extract text."""
     print("PROCESSING PAGE...")
-    page = page.resize(
-        (int(page.width * 0.75), int(page.height * 0.75))
-    )  # Resize to double the size
+    page = page.resize((int(page.width * 0.75), int(page.height * 0.75)))  # Resize to double the size
     img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
+    result = ocr.ocr(img, cls=True)
 
-    # Initialize PaddleOCR (Enable GPU if available)
-    ocr = PaddleOCR(
-        use_angle_cls=False,
-        lang="en",
-        rec_algorithm="CRNN",
-        use_gpu=True,  # Enable GPU acceleration
-    )
-
-    result = ocr.ocr(img, cls=False)
-
-    extracted_text = " ".join(
+    return " ".join(
         word_info[0]
         for line in result[0]
         for word_info in line
         if isinstance(word_info[0], str)
     )
-
-    del ocr  # Free up resources
-    return extracted_text
 
 
 def doc_parse(file: BinaryIO):
@@ -77,3 +75,4 @@ def doc_parse(file: BinaryIO):
     print(f"Document parsing took {end_time - start_time:.2f} seconds.")
 
     return extracted_text
+
