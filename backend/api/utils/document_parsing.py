@@ -3,7 +3,7 @@ from io import BytesIO
 from typing import BinaryIO
 from paddleocr import PaddleOCR
 from pdf2image import convert_from_bytes
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 from backend.settings import POPPLER_PATH
 
@@ -12,6 +12,7 @@ import cv2
 import requests
 import time
 import multiprocessing
+import os
 
 # Initialize PaddleOCR (Enable GPU if available)
 ocr = PaddleOCR(
@@ -45,6 +46,8 @@ def download_file(file_url: str):
 
 def process_page(page):
     """Process a single page using OCR and extract text."""
+
+    page = page.resize((int(page.width * 0.75), int(page.height * 0.75)))  # Resize to double the size
     img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
     result = ocr.ocr(img, cls=True)
 
@@ -60,17 +63,18 @@ def doc_parse(file: BinaryIO):
     start_time = time.time()
     pdf_bytes = file.read()
 
+    extracted_text = []
+    num_workers = min(2, max(1, os.cpu_count() // 2))
+
+    print("START DOCUMENT PROCESSING...")
+
     # Convert PDF to images (Lower DPI to speed up conversion)
     all_pages = convert_from_bytes(pdf_bytes, dpi=100, poppler_path=POPPLER_PATH)
 
-    # Process all pages
-    pages = all_pages
-    print("PROCESSING PAGES: ", len(pages))
-    # Use multi-threading with optimal CPU core count
-    num_workers = min(4, multiprocessing.cpu_count())  # Max 4 threads
-    print("NUM WORKERS: ", num_workers)
-    with ThreadPoolExecutor(max_workers=num_workers) as executor:
-        extracted_text = list(executor.map(process_page, pages))
+    with ProcessPoolExecutor(max_workers=num_workers) as executor:
+        extracted_text = list(executor.map(process_page, all_pages))
+    # with ThreadPoolExecutor(max_workers=num_workers) as executor:
+    #     extracted_text = list(executor.map(process_page, pages))
     print("EXTRACTED TEXT: ", extracted_text)
     end_time = time.time()
     print(f"Document parsing took {end_time - start_time:.2f} seconds.")
