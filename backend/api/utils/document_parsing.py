@@ -11,22 +11,6 @@ import cv2
 import requests
 import time
 import gc
-import sys
-
-
-if not any(cmd in sys.argv for cmd in ["makemigrations", "migrate"]):
-    # Initialize PaddleOCR (Enable GPU if available)
-    ocr = PaddleOCR(
-        use_angle_cls=True,
-        lang="en",
-        rec_algorithm="CRNN",
-        det_db_box_thresh=0.6,
-        det_db_unclip_ratio=1.5,
-        use_gpu=True  # Enable GPU acceleration
-    )
-else:
-    ocr = None
-
 
 def download_file(file_url: str):
     try:
@@ -54,8 +38,20 @@ def process_page(page):
     scale_factor = 0.75
     page = page.resize((int(page.width * scale_factor), int(page.height * scale_factor)))  # Resize to double the size
     img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
-    
+
+    ocr = PaddleOCR(
+        use_angle_cls=True,
+        lang="en",
+        rec_algorithm="CRNN",
+        det_db_box_thresh=0.6,
+        det_db_unclip_ratio=1.5,
+        use_gpu=True  # Enable GPU acceleration
+    )
+
     result = ocr.ocr(img)  # Perform OCR on the image
+
+    del ocr
+    gc.collect()
 
     return " ".join(
         word_info[0]
