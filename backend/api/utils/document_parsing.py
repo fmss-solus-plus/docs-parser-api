@@ -14,15 +14,6 @@ import time
 import multiprocessing
 import os
 
-# Initialize PaddleOCR (Enable GPU if available)
-ocr = PaddleOCR(
-    use_angle_cls=True,
-    lang="en",
-    rec_algorithm="CRNN",
-    det_db_box_thresh=0.6,
-    det_db_unclip_ratio=1.5,
-    use_gpu=True  # Enable GPU acceleration
-)
 
 def download_file(file_url: str):
     try:
@@ -47,16 +38,36 @@ def download_file(file_url: str):
 def process_page(page):
     """Process a single page using OCR and extract text."""
     print("PROCESSING PAGE...")
-    page = page.resize((int(page.width * 0.75), int(page.height * 0.75)))  # Resize to double the size
+    page = page.resize(
+        (int(page.width * 0.75), int(page.height * 0.75))
+    )  # Resize to double the size
     img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
-    result = ocr.ocr(img, cls=True)
 
-    return " ".join(
+    # Initialize PaddleOCR (Enable GPU if available)
+    ocr = PaddleOCR(
+        use_angle_cls=False,
+        lang="en",
+        rec_algorithm="CRNN",
+        use_gpu=True,  # Enable GPU acceleration
+    )
+
+    result = ocr.ocr(img, cls=False)
+
+    extracted_text = " ".join(
         word_info[0]
         for line in result[0]
         for word_info in line
         if isinstance(word_info[0], str)
     )
+
+    del ocr
+    return extracted_text
+
+def process_page_wrapper(page):
+    """Run OCR in a separate process to free memory after execution."""
+    with multiprocessing.Pool(1) as pool:
+        extracted_text = pool.apply(process_page, (page,))
+    return extracted_text
 
 
 def doc_parse(file: BinaryIO):
@@ -68,11 +79,10 @@ def doc_parse(file: BinaryIO):
 
     print("START DOCUMENT PROCESSING...")
     # Process only the first page
-    extracted_text = process_page(all_pages[0]) if all_pages else ""
+    extracted_text = process_page_wrapper(all_pages[0]) if all_pages else ""
 
     print("EXTRACTED TEXT: ", extracted_text)
     end_time = time.time()
     print(f"Document parsing took {end_time - start_time:.2f} seconds.")
 
     return extracted_text
-
