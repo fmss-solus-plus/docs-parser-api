@@ -35,9 +35,9 @@ def download_file(file_url: str):
 def process_page(page):
     """Process a single page using OCR and extract text."""
     print("PROCESSING PAGE...")
-    scale_factor = 0.75
-    page = page.resize((int(page.width * scale_factor), int(page.height * scale_factor)))  # Resize to double the size
-    img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
+    extracted_text = []
+
+    segments = segment_image(page)
 
     ocr = PaddleOCR(
         use_angle_cls=True,
@@ -48,17 +48,38 @@ def process_page(page):
         use_gpu=True  # Enable GPU acceleration
     )
 
-    result = ocr.ocr(img)  # Perform OCR on the image
+    for segment in segments:
+        result = ocr.ocr(np.array(segment))  # Perform OCR on the image
+
+        if result and isinstance(result, list) and isinstance(result[0], list):
+            for line in result[0]:
+                if isinstance(line, list) and len(line) > 1 and isinstance(line[1], tuple):
+                    text = line[1][0]  # Extract the recognized word
+                    extracted_text.append(text)
 
     del ocr
     gc.collect()
+    return " ".join(extracted_text)
 
-    return " ".join(
-        word_info[0]
-        for line in result[0]
-        for word_info in line
-        if isinstance(word_info[0], str)
-    )
+def segment_image(image):
+    """Segment an image into smaller text regions using OpenCV"""
+    print("Segmenting image...")
+    image_np = np.array(image)
+    gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
+    edged = cv2.Canny(gray, 30, 150)
+    _, thresh = cv2.threshold(edged, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+    # Detect text regions
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    segments = []
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
+        if h > 10 and w > 10:
+            segment = image.crop((x, y, x + w, y + h))
+            segments.append(segment)
+
+    return segments
 
 
 def doc_parse(file: BinaryIO):
@@ -75,7 +96,6 @@ def doc_parse(file: BinaryIO):
     del pdf_bytes, all_pages
     gc.collect()
 
-    print("EXTRACTED TEXT: ", extracted_text)
     end_time = time.time()
     print(f"Document parsing took {end_time - start_time:.2f} seconds.")
 
