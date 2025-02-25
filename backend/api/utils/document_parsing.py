@@ -43,7 +43,7 @@ def process_page(page):
         use_angle_cls=True,
         lang="en",
         rec_algorithm="CRNN",
-        det_db_box_thresh=0.6,
+        det_db_box_thresh=0.3,
         det_db_unclip_ratio=1.5,
         use_gpu=True  # Enable GPU acceleration
     )
