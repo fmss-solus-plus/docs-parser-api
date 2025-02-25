@@ -43,7 +43,7 @@ def process_page(page):
         use_angle_cls=True,
         lang="en",
         rec_algorithm="CRNN",
-        det_db_box_thresh=0.3,
+        det_db_box_thresh=0.6,
         det_db_unclip_ratio=1.5,
         use_gpu=True  # Enable GPU acceleration
     )
@@ -66,7 +66,7 @@ def doc_parse(file: BinaryIO):
     pdf_bytes = file.read()
 
     # Convert PDF to images (Lower DPI to speed up conversion)
-    all_pages = convert_from_bytes(pdf_bytes, dpi=200, poppler_path=POPPLER_PATH)
+    all_pages = convert_from_bytes(pdf_bytes, dpi=100, poppler_path=POPPLER_PATH)
 
     print("START DOCUMENT PROCESSING...")
     # Process only the first page
