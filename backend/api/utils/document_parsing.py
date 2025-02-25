@@ -59,7 +59,7 @@ def process_page(page):
 
     del ocr
     gc.collect()
-    return " ".join(extracted_text)
+    return extracted_text
 
 def segment_image(image):
     """Segment an image into smaller text regions using OpenCV"""
