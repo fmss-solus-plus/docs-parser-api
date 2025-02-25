@@ -37,6 +37,7 @@ POSTGRES_DB_USER = get_env_variable("POSTGRES_DB_USER")
 POSTGRES_DB_PASSWORD = get_env_variable("POSTGRES_DB_PASSWORD")
 DB_HOST = get_env_variable("DB_HOST")
 DB_PORT = get_env_variable("DB_PORT")
+DB_NAME = get_env_variable("DB_NAME")
 
 ALLOWED_HOSTS = ["*"]
 
@@ -57,6 +58,8 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -68,11 +71,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "drf_spectacular",
     "rest_framework",
+    "corsheaders",
     "api",
     "users",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -109,7 +114,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "solus+_docsapi_db",
+        "NAME": DB_NAME,
         "USER": POSTGRES_DB_USER,
         "PASSWORD": POSTGRES_DB_PASSWORD,
         "HOST": DB_HOST,
