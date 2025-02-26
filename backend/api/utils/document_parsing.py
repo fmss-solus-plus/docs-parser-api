@@ -31,35 +31,33 @@ def download_file(file_url: str):
     except Exception as e:
         return Response({"message": str(e)}, status=STATUS_CODES["errors"][500])
 
-
 def process_page(page):
     """Process a single page using OCR and extract text."""
     print("PROCESSING PAGE...")
-    extracted_text = []
-
-    segments = segment_image(page)
+    scale_factor = 0.75
+    page = page.resize((int(page.width * scale_factor), int(page.height * scale_factor)))  # Resize to double the size
+    img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
 
     ocr = PaddleOCR(
         use_angle_cls=True,
         lang="en",
         rec_algorithm="CRNN",
-        det_db_box_thresh=0.6,
+        det_db_box_thresh=0.3,
         det_db_unclip_ratio=1.5,
         use_gpu=True  # Enable GPU acceleration
     )
 
-    for segment in segments:
-        result = ocr.ocr(np.array(segment))  # Perform OCR on the image
-
-        if result and isinstance(result, list) and isinstance(result[0], list):
-            for line in result[0]:
-                if isinstance(line, list) and len(line) > 1 and isinstance(line[1], tuple):
-                    text = line[1][0]  # Extract the recognized word
-                    extracted_text.append(text)
+    result = ocr.ocr(img)  # Perform OCR on the image
 
     del ocr
     gc.collect()
-    return extracted_text
+
+    return " ".join(
+        word_info[0]
+        for line in result[0]
+        for word_info in line
+        if isinstance(word_info[0], str)
+    )
 
 def segment_image(image):
     """Segment an image into smaller text regions using OpenCV"""
