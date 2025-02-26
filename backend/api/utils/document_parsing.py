@@ -42,7 +42,7 @@ def process_page(page):
         use_angle_cls=True,
         lang="en",
         rec_algorithm="CRNN",
-        det_db_box_thresh=0.3,
+        det_db_box_thresh=0.6,
         det_db_unclip_ratio=1.5,
         use_gpu=True  # Enable GPU acceleration
     )
@@ -58,26 +58,6 @@ def process_page(page):
         for word_info in line
         if isinstance(word_info[0], str)
     )
-
-def segment_image(image):
-    """Segment an image into smaller text regions using OpenCV"""
-    print("Segmenting image...")
-    image_np = np.array(image)
-    gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
-    # edged = cv2.Canny(gray, 30, 150)
-    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
-    # Detect text regions
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    segments = []
-    for contour in contours:
-        x, y, w, h = cv2.boundingRect(contour)
-        if h > 10 and w > 10:
-            segment = image.crop((x, y, x + w, y + h))
-            segments.append(segment)
-
-    return segments
 
 
 def doc_parse(file: BinaryIO):
