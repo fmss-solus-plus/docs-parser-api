@@ -27,26 +27,22 @@ def download_file(file_url: str):
                 {"message": STATUS_MESSAGES["errors"]["UNSUPPORTED_FILE_FORMAT"]},
                 status=STATUS_CODES["errors"][415],
             )
-        return BytesIO(response.content)
+        
+        file_stream = BytesIO()
+        for chunk in response.iter_content(chunk_size=4096):
+            file_stream.write(chunk)
+        
+        file_stream.seek(0)
+        return file_stream
     except Exception as e:
         return Response({"message": str(e)}, status=STATUS_CODES["errors"][500])
 
-
-def process_page(page):
+def process_page(page, ocr: PaddleOCR):
     """Process a single page using OCR and extract text."""
     print("PROCESSING PAGE...")
     scale_factor = 0.75
-    page = page.resize((int(page.width * scale_factor), int(page.height * scale_factor)))  # Resize to double the size
-    img = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
-
-    ocr = PaddleOCR(
-        use_angle_cls=True,
-        lang="en",
-        rec_algorithm="CRNN",
-        det_db_box_thresh=0.3,
-        det_db_unclip_ratio=1.5,
-        use_gpu=True  # Enable GPU acceleration
-    )
+    resize_page = page.resize((int(page.width * scale_factor), int(page.height * scale_factor)))  # Resize to double the size
+    img = cv2.cvtColor(np.array(resize_page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
 
     result = ocr.ocr(img)  # Perform OCR on the image
 
@@ -65,19 +61,26 @@ def doc_parse(file: BinaryIO):
     start_time = time.time()
     pdf_bytes = file.read()
 
+    ocr = PaddleOCR(
+        use_angle_cls=True,
+        lang="en",
+        rec_algorithm="CRNN",
+        det_db_box_thresh=0.6,
+        det_db_unclip_ratio=1.5,
+        use_gpu=True  # Enable GPU acceleration
+    )
+
     # Convert PDF to images (Lower DPI to speed up conversion)
-    all_pages = convert_from_bytes(pdf_bytes, dpi=200, poppler_path=POPPLER_PATH)
+    extracted_text = []
 
     print("START DOCUMENT PROCESSING...")
-    # Process only the first page
-    extracted_text = process_page(all_pages[0]) if all_pages else ""
+    for page in convert_from_bytes(pdf_bytes, dpi=100, poppler_path=POPPLER_PATH):
+        extracted_text.append(process_page(page=page, ocr=ocr))
+        del page
+        gc.collect()
 
-    del pdf_bytes, all_pages
-    gc.collect()
-
-    print("EXTRACTED TEXT: ", extracted_text)
     end_time = time.time()
     print(f"Document parsing took {end_time - start_time:.2f} seconds.")
 
-    return extracted_text
+    return " ".join(extracted_text)
 

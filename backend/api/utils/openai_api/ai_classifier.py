@@ -1,6 +1,7 @@
 from openai import OpenAI
 from api.models import OpenAIRequest
 from backend.settings import AZURE_OPENAI_API_KEY
+import json
 
 
 def openai_doc_classifier(resume_text: str, templates: str, document_type: str):
@@ -11,7 +12,7 @@ def openai_doc_classifier(resume_text: str, templates: str, document_type: str):
 
     openai_model = "gpt-3.5-turbo"
 
-    messages.append({"role": "user", "content": user_info})
+    messages.append({"role": "user", "content": json.dumps(user_info)})
 
     response = openai_api.chat.completions.create(
         model=openai_model,
