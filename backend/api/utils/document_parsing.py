@@ -62,12 +62,12 @@ def doc_parse(file: BinaryIO):
     pdf_bytes = file.read()
 
     ocr = PaddleOCR(
-        use_angle_cls=True,
+        use_angle_cls=False,
         lang="en",
         rec_algorithm="CRNN",
         det_db_box_thresh=0.6,
         det_db_unclip_ratio=1.5,
-        use_gpu=True  # Enable GPU acceleration
+        use_gpu=False  # Enable GPU acceleration
     )
 
     # Convert PDF to images (Lower DPI to speed up conversion)
