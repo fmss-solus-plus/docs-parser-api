@@ -147,9 +147,9 @@ def upload_doc_fileurl(request):
         parsed_file = doc_parse(file=downloaded_file)
 
         # DO OPENAI INTEGRATION HERE
-        # result = openai_doc_classifier(
-        #     resume_text=parsed_file, templates=templates, document_type=doc_type
-        # )
+        result = openai_doc_classifier(
+            resume_text=parsed_file, templates=templates, document_type=doc_type
+        )
         print("PARSED_FILEEE: ", parsed_file)
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -158,7 +158,7 @@ def upload_doc_fileurl(request):
         return Response(
             {
                 "message": f'{STATUS_MESSAGES["success"]["FILE_PROCESSED"]}',
-                "extracted_file": parsed_file,
+                "extracted_file": result,
             },
             status=STATUS_CODES["success"][200],
         )
