@@ -5,14 +5,15 @@ import boto3
 
 load_dotenv('.env')
 
-def get_env_variable(name):
+# Detect environment: Default to 'LOCAL' if not set
+ENV = os.getenv("APP_ENV", 'LOCAL').upper() 
+print(f"Running in {ENV} environments")	
+
+def get_env_variable(name, app_env=bool):
     """Fetch environment variables locally or from AWS Parameter Store based on the environment."""
 
-    # Detect environment: Default to 'LOCAL' if not set
-    ENV = os.getenv("APP_ENV", 'LOCAL').upper()
-
     # If running locally, fetch from system environment
-    if ENV == "LOCAL":
+    if app_env is True:
         return os.getenv(name)
 
     # If running in 'DEV' or 'PROD', fetch from AWS Parameter Store
@@ -26,3 +27,8 @@ def get_env_variable(name):
     except Exception as e:
         print(f"Error fetching {name} from AWS: {e}")
         return None  # Return None if the parameter is not found
+
+def check_env():
+    if ENV == 'LOCAL':
+        return True
+    return False
