@@ -18,4 +18,4 @@ pytz==2025.1
 psycopg2-binary==2.9.10
 pdf2image==1.17.0
 
-setuptools==68.1.2
+setuptools==70.0.0
