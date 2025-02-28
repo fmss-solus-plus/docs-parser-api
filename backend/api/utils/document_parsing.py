@@ -1,3 +1,8 @@
+"""
+    This is file contains functions that:
+        - download the files if it was uploaded thru fileUrl.
+        - process the document using OCR.
+"""
 from rest_framework.response import Response
 from io import BytesIO
 from typing import BinaryIO

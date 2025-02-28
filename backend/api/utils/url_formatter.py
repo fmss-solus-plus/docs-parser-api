@@ -1,4 +1,7 @@
-from urllib.parse import quote, unquote
+"""
+    This is file contains functions that reformat the url of the uploaded files.
+"""
+from urllib.parse import quote
 
 
 def encode_url(url: str) -> str:
