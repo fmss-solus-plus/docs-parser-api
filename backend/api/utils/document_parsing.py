@@ -7,7 +7,6 @@ from backend.status_code import STATUS_CODES, STATUS_MESSAGES
 from backend.settings import POPPLER_PATH
 
 import numpy as np
-import cv2
 import requests
 import time
 import gc
@@ -16,6 +15,8 @@ import sys
 ocr = None
 if "makemigrations" not in sys.argv and "migrate" not in sys.argv:
     ocr = PaddleOCR(
+        det_model_dir="api/utils/ai_models/en_PP-OCRv3_det_infer",  # Use English OCR model
+        rec_model_dir="api/utils/ai_models/en_PP-OCRv3_rec_infer", 
         use_angle_cls=False,
         lang="en",
         rec_algorithm="CRNN",
@@ -23,7 +24,6 @@ if "makemigrations" not in sys.argv and "migrate" not in sys.argv:
         det_db_unclip_ratio=1.5,
         use_gpu=False  # Enable GPU acceleration
     )
-
 def download_file(file_url: str):
     try:
         response = requests.get(file_url, timeout=3)
@@ -52,9 +52,10 @@ def download_file(file_url: str):
 def process_page(page, ocr: PaddleOCR):
     """Process a single page using OCR and extract text."""
     print("PROCESSING PAGE...")
+    page = page.convert("L")  # Convert to grayscale format
     scale_factor = 0.75
     resize_page = page.resize((int(page.width * scale_factor), int(page.height * scale_factor)))  # Resize to double the size
-    img = cv2.cvtColor(np.array(resize_page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
+    img = np.array(resize_page)  # Convert to numpy array
 
     result = ocr.ocr(img)  # Perform OCR on the image
 
