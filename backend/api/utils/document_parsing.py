@@ -58,9 +58,6 @@ def process_page(page, ocr: PaddleOCR):
 
     result = ocr.ocr(img)  # Perform OCR on the image
 
-    del ocr
-    gc.collect()
-
     return " ".join(
         word_info[0]
         for line in result[0]
