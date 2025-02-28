@@ -5,23 +5,23 @@ import os
 from .settings import *
 from .settings import BASE_DIR
 
-ALLOWED_HOSTS = [os.environ.get('WEBSITE_HOSTNAME')]
-CSRF_TRUSTED_ORIGINS = ['https://' + os.environ.get('WEBSITE_HOSTNAME')]
+ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME']]
+CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
 DEBUG = False
 
-connection_string = os.environ.get('AZURE_POSTGRESQL_CONNECTIONSTRING')
-parameters = {pair.split("="):pair.split("=")[1] for pair in connection_string.split(' ')}
+conn_string = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
+conn_string_params = {pair.split("="):pair.split("=")[1] for pair in conn_string.split(' ')}
 
-SECRET_KEY = None
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
-AZURE_OPENAI_API_KEY = None
+AZURE_OPENAI_API_KEY = os.environ['AZURE_OPENAI_API_KEY']
 AZURE_OPENAI_ENDPOINT = None
 
 POPPLER_PATH = None
-POSTGRES_DB_USER = parameters["user"]
-POSTGRES_DB_PASSWORD = parameters["password"]
-DB_HOST = parameters["host"]
-DB_NAME = parameters["dbname"]
+POSTGRES_DB_USER = conn_string_params["user"]
+POSTGRES_DB_PASSWORD = conn_string_params["password"]
+DB_HOST = conn_string_params["host"]
+DB_NAME = conn_string_params["dbname"]
 DB_PORT = None
 
 
