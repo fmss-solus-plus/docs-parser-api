@@ -12,9 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-from backend.utils import get_env_variable, check_env
-
+from dotenv import load_dotenv
 import os
+
+load_dotenv('.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,23 +24,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-app_env = check_env()
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = app_env
+DEBUG = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env_variable("DJANGO_SECRET_KEY", app_env=app_env)
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-AZURE_OPENAI_API_KEY = get_env_variable("AZURE_OPENAI_API_KEY", app_env=app_env)
-AZURE_OPENAI_ENDPOINT = get_env_variable("AZURE_OPENAI_ENDPOINT", app_env=app_env)
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 
-POPPLER_PATH = get_env_variable("POPPLER_PATH", app_env=app_env)
-POSTGRES_DB_USER = get_env_variable("POSTGRES_DB_USER", app_env=app_env)
-POSTGRES_DB_PASSWORD = get_env_variable("POSTGRES_DB_PASSWORD", app_env=app_env)
-DB_HOST = get_env_variable("DB_HOST", app_env=app_env)
-DB_PORT = get_env_variable("DB_PORT", app_env=app_env)
-DB_NAME = get_env_variable("DB_NAME", app_env=app_env)
+POPPLER_PATH = os.getenv("POPPLER_PATH")
+POSTGRES_DB_USER = os.getenv("POSTGRES_DB_USER")
+POSTGRES_DB_PASSWORD = os.getenv("POSTGRES_DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
 
 ALLOWED_HOSTS = ["*"]
 
