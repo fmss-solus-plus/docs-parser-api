@@ -11,6 +11,18 @@ import cv2
 import requests
 import time
 import gc
+import sys
+
+ocr = None
+if "makemigrations" not in sys.argv and "migrate" not in sys.argv:
+    ocr = PaddleOCR(
+        use_angle_cls=False,
+        lang="en",
+        rec_algorithm="CRNN",
+        det_db_box_thresh=0.6,
+        det_db_unclip_ratio=1.5,
+        use_gpu=False  # Enable GPU acceleration
+    )
 
 def download_file(file_url: str):
     try:
@@ -60,15 +72,6 @@ def process_page(page, ocr: PaddleOCR):
 def doc_parse(file: BinaryIO):
     start_time = time.time()
     pdf_bytes = file.read()
-
-    ocr = PaddleOCR(
-        use_angle_cls=False,
-        lang="en",
-        rec_algorithm="CRNN",
-        det_db_box_thresh=0.6,
-        det_db_unclip_ratio=1.5,
-        use_gpu=False  # Enable GPU acceleration
-    )
 
     # Convert PDF to images (Lower DPI to speed up conversion)
     extracted_text = []
