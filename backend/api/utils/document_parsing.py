@@ -52,9 +52,10 @@ def download_file(file_url: str):
 def process_page(page, ocr: PaddleOCR):
     """Process a single page using OCR and extract text."""
     print("PROCESSING PAGE...")
+    page = page.convert("L")  # Convert to grayscale format
     scale_factor = 0.75
     resize_page = page.resize((int(page.width * scale_factor), int(page.height * scale_factor)))  # Resize to double the size
-    img = cv2.cvtColor(np.array(resize_page), cv2.COLOR_RGB2GRAY)  # Convert to grayscale
+    img = np.array(resize_page)  # Convert to numpy array
 
     result = ocr.ocr(img)  # Perform OCR on the image
 
