@@ -5,17 +5,8 @@ import boto3
 
 load_dotenv('.env')
 
-# Detect environment: Default to 'LOCAL' if not set
-ENV = os.getenv("APP_ENV", 'LOCAL').upper() 
-print(f"Running in {ENV} environments")	
-
-def get_env_variable(name, app_env=bool):
+def get_env_variable(name):
     """Fetch environment variables locally or from AWS Parameter Store based on the environment."""
-
-    # If running locally, fetch from system environment
-    if app_env is True:
-        return os.getenv(name)
-
     # If running in 'DEV' or 'PROD', fetch from AWS Parameter Store
     try:
         ssm = boto3.client("ssm", region_name="ap-southeast-2")  # Adjust region
@@ -29,6 +20,13 @@ def get_env_variable(name, app_env=bool):
         return None  # Return None if the parameter is not found
 
 def check_env():
-    if ENV == 'LOCAL':
-        return True
-    return False
+    # Detect environment: Default to 'LOCAL' if not set
+    env = os.getenv("APP_ENV", 'LOCAL').upper() 
+    print(f"Running in {env} environments")	
+
+    if env == 'LOCAL':
+        return 'backend.settings'
+    elif env == 'DEV_AWS':
+        return 'backend.aws_deployment'
+    elif env == 'DEV_AZURE':
+        return 'backend.azure_deployment'
