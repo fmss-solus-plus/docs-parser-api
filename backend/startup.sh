@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python manage.py collecstatic --noinput
+cd backend
 
 python manage.py migrate
 
