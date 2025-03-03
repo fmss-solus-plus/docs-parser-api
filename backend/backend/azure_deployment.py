@@ -21,8 +21,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+print("USING AZURE ENV")
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 conn_string = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
 conn_string_params = {pair.split("="):pair.split("=")[1] for pair in conn_string.split(' ')}
