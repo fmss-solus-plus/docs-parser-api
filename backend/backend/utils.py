@@ -24,9 +24,9 @@ def check_env():
     env = os.getenv("APP_ENV", 'LOCAL').upper() 
     print(f"Running in {env} environments")	
 
-    if env == 'LOCAL':
-        return 'backend.settings'
-    elif env == 'DEV_AWS':
+    if env == 'DEV_AWS':
         return 'backend.aws_deployment'
     elif env == 'DEV_AZURE':
         return 'backend.azure_deployment'
+    else:
+        return 'backend.settings'
