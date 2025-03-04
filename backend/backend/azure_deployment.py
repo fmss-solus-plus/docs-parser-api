@@ -26,7 +26,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 conn_string = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
-conn_string_params = {pair.split("="):pair.split("=")[1] for pair in conn_string.split(' ')}
+conn_string_params = {pair.split("=")[0]: pair.split("=")[1] for pair in conn_string.split(' ')}
 
 SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
